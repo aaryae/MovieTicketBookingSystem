@@ -138,8 +138,10 @@ REST_FRAMEWORK = {
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / "static"]
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # Add this for production
 CORS_ALLOW_ALL_ORIGINS = True
 
 # Media files (movie images)
-MEDIA_URL = '/movie_posters/'
-MEDIA_ROOT = BASE_DIR / 'movie_posters'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR,"media")
+

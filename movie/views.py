@@ -38,7 +38,12 @@ class SignupView(APIView):
 class MovieAPI(ModelViewSet):
     queryset = Movie.objects.all()
     serializer_class = MovieSerializer
-    permission_classes = [IsAdminUser]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
 
 class ShowTimeAPI(ReadOnlyModelViewSet):
     queryset = ShowTime.objects.all()

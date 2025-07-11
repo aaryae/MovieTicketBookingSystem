@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (result.role === 'admin') {
           window.location.href = '/sudo/dashboard/';
         } else {
-          window.location.href = '/user/profile/';
+          window.location.href = '/profile/';
         }
       } else {
         const error = await response.json();

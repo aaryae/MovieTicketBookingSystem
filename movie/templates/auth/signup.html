@@ -6,33 +6,33 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Library Portal – Sign Up</title>
+  <title>Movie Ticket Booking – Sign Up</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
 <body class="h-full overflow-hidden">
   <div class="w-full flex flex-col md:flex-row h-full">
     <!-- Left panel -->
-    <div class="hidden md:flex md:w-1/2 bg-[#6941c5] items-center justify-center">
+    <div class="w-full md:flex w-1/2 bg-[#202a44] items-center justify-center">
       <div class="text-white p-8">
-        <h2 class="text-3xl font-bold mb-4">Welcome to Your Library Portal</h2>
-        <h3 class="text-2xl font-bold mb-6">Join us &amp; explore knowledge</h3>
+        <h2 class="text-3xl font-bold mb-4">Welcome to Movie Ticket Booking</h2>
+        <h3 class="text-2xl font-bold mb-6">Join us &amp; experience the magic of cinema</h3>
         <ul class="space-y-2 list-disc pl-6 text-lg">
-          <li>Borrow books online</li>
-          <li>Reserve study rooms</li>
-          <li>24/7 digital resources</li>
-          <li>Personalized suggestions</li>
+          <li>Book movie tickets online</li>
+          <li>Choose your favorite seats</li>
+          <li>Instant booking confirmation</li>
+          <li>Discover the latest movies</li>
         </ul>
       </div>
     </div>
 
     <!-- Right panel -->
-    <div class="w-full md:w-1/2 h-full overflow-y-auto md:ml-[50%]">
+    <div class="w-full w-1/2 h-full overflow-y-auto ">
       <div class="flex flex-col justify-center min-h-full px-6 py-8 md:px-12 md:py-16">
         <div class="w-full max-w-md mx-auto">
           <!-- Logo -->
           <div class="flex justify-center mb-6">
-            <span class="text-[#6941c5] text-4xl font-extrabold">LOGO</span>
+            <span class="text-[#202a44] text-4xl font-extrabold">aaryae</span>
           </div>
 
           <h1 class="text-xl md:text-2xl font-bold text-gray-800 mb-8 text-center">Create your account</h1>
@@ -42,33 +42,33 @@
             <div>
               <label for="username" class="block text-sm font-medium text-gray-700">Username <span class="text-red-500">*</span></label>
               <input id="username" name="username" type="text" required placeholder="Enter your username"
-                     class="w-full rounded-md border-gray-300 px-4 py-2 focus:ring-[#6941c5] focus:border-[#6941c5]" />
+                     class="w-full rounded-md border-gray-300 px-4 py-2 focus:ring-[#202a44] focus:border-[#202a44]" />
             </div>
 
             <!-- Email -->
             <div>
               <label for="email" class="block text-sm font-medium text-gray-700">Email <span class="text-red-500">*</span></label>
               <input id="email" name="email" type="email" required placeholder="Enter your email"
-                     class="w-full rounded-md border-gray-300 px-4 py-2 focus:ring-[#6941c5] focus:border-[#6941c5]" />
+                     class="w-full rounded-md border-gray-300 px-4 py-2 focus:ring-[#202a44] focus:border-[#202a44]" />
             </div>
 
             <!-- Password -->
             <div>
               <label for="password" class="block text-sm font-medium text-gray-700">Password <span class="text-red-500">*</span></label>
               <input id="password" name="password" type="password" required placeholder="Enter your password"
-                     class="w-full rounded-md border-gray-300 px-4 py-2 focus:ring-[#6941c5] focus:border-[#6941c5]" />
+                     class="w-full rounded-md border-gray-300 px-4 py-2 focus:ring-[#202a44] focus:border-[#202a44]" />
             </div>
 
             <!-- Submit button -->
             <button type="submit"
-                    class="w-full bg-[#6941c5] text-white py-2 px-4 rounded-md hover:bg-[#5c3aa7] transition duration-200">
+                    class="w-full bg-[#202a44] text-white py-2 px-4 rounded-md hover:bg-[#5c3aa7] transition duration-200">
               Sign Up
             </button>
           </form>
 
           <p class="mt-6 text-center text-sm text-gray-600">
             Already have an account?
-            <a href="/auth/login" class="text-[#6941c5] font-medium hover:underline">Login</a>
+            <a href="/login" class="text-[#202a44] font-medium hover:underline">Login</a>
           </p>
         </div>
       </div>

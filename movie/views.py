@@ -8,6 +8,8 @@ from django_filters import rest_framework as filters
 from rest_framework import permissions, status
 from rest_framework.response import Response
 from django.db import transaction
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.permissions import IsAdminUser
 
 
 from movie.models import Movie, ShowTime, Seat, Booking
@@ -17,21 +19,26 @@ class SignupView(APIView):
     def post(self, request):
         username = request.data.get("username")
         password = request.data.get("password")
+        email = request.data.get("email")  # <-- get email
 
-        if not username or not password:
-            return Response({"error": "Username and password required"}, status=400)
+        if not username or not password or not email:
+            return Response({"error": "Username, email, and password required"}, status=400)
 
         if User.objects.filter(username=username).exists():
             return Response({"error": "User already exists"}, status=400)
 
-        user = User.objects.create_user(username=username, password=password)
+        if User.objects.filter(email=email).exists():
+            return Response({"error": "Email already exists"}, status=400)
+
+        user = User.objects.create_user(username=username, password=password, email=email)  # <-- set email
         token = Token.objects.create(user=user)
         return Response({"token": token.key}, status=status.HTTP_201_CREATED)
     
 
-class MovieAPI(ReadOnlyModelViewSet):
+class MovieAPI(ModelViewSet):
     queryset = Movie.objects.all()
     serializer_class = MovieSerializer
+    permission_classes = [IsAdminUser]
 
 class ShowTimeAPI(ReadOnlyModelViewSet):
     queryset = ShowTime.objects.all()
@@ -87,3 +94,28 @@ class BookingAPI(ModelViewSet):
 
         booking.delete()
         return Response({"message": "Booking cancelled"}, status=status.HTTP_204_NO_CONTENT)
+
+class CustomAuthToken(ObtainAuthToken):
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data,
+                                           context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        token, created = Token.objects.get_or_create(user=user)
+        # Determine role
+        if user.is_superuser:
+            role = 'admin'
+        elif user.is_staff:
+            role = 'staff'
+        else:
+            role = 'user'
+        return Response({
+            'token': token.key,
+            'role': role
+        })
+
+class UserListAPI(APIView):
+    permission_classes = [IsAdminUser]
+    def get(self, request):
+        users = User.objects.all().values('id', 'username', 'email', 'is_staff', 'is_superuser')
+        return Response(list(users))

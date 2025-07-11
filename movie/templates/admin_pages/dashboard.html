@@ -1,0 +1,229 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              "admin-dark": "#1f2937",
+              "admin-darker": "#111827",
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body class="bg-gray-50 font-sans">
+    <div class="flex h-screen">
+      <!-- Sidebar -->
+      <div class="w-64 bg-admin-dark text-white shadow-lg">
+        <div class="p-6 border-b border-gray-700">
+          <h1 class="text-2xl font-bold text-blue-400">Admin Panel</h1>
+        </div>
+
+        <nav class="mt-8">
+          <div class="px-4 space-y-2">
+            <a
+              href="#"
+              class="flex items-center px-4 py-3 text-sm font-medium rounded-lg bg-blue-600 text-white"
+              onclick="showSection('users')"
+            >
+              <span
+                class="w-5 h-5 mr-3 bg-white bg-opacity-20 rounded text-xs flex items-center justify-center"
+                >👥</span
+              >
+              Users
+            </a>
+
+            <a
+              href="#"
+              class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white"
+              onclick="showSection('dashboard')"
+            >
+              <span
+                class="w-5 h-5 mr-3 bg-white bg-opacity-20 rounded text-xs flex items-center justify-center"
+                >📊</span
+              >
+              Movies
+            </a>
+
+            <a
+              href="#"
+              class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white"
+              onclick="showSection('settings')"
+            >
+              <span
+                class="w-5 h-5 mr-3 bg-white bg-opacity-20 rounded text-xs flex items-center justify-center"
+                >⚙️</span
+              >
+              Settings
+            </a>
+          </div>
+        </nav>
+
+        <div class="absolute bottom-0 w-64 p-4 border-t border-gray-700">
+          <a href="/login/">logout</a>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="flex-1 overflow-auto">
+        <!-- Header -->
+        <header class="bg-white shadow-sm border-b border-gray-200">
+          <div class="px-6 py-4">
+            <h2 class="text-2xl font-semibold text-gray-800" id="pageTitle">
+              User Management
+            </h2>
+          </div>
+        </header>
+
+        <!-- Content Area -->
+        <main class="p-6">
+          <!-- Users Section -->
+          <div id="usersSection" class="section">
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+              <div class="px-6 py-4 border-b border-gray-200">
+                <div class="flex justify-between items-center">
+                  <h3 class="text-lg font-semibold text-gray-800">
+                    Users List
+                  </h3>
+                  <button
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                  >
+                    Add New User
+                  </button>
+                </div>
+              </div>
+
+              <div class="overflow-x-auto">
+                <div id="user-table-container">
+                  <p class="text-gray-500">Loading users...</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Movies Section (was Dashboard Section) -->
+          <div id="dashboardSection" class="section hidden">
+            <h3 class="text-xl font-semibold text-gray-800 mb-6">Movies</h3>
+            <button
+              class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors float-right"
+            >
+              Add New movie
+            </button>
+
+            <div
+              id="movies-container"
+              class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+            ></div>
+          </div>
+
+          <!-- Settings Section -->
+          <div id="settingsSection" class="section hidden">
+            <div
+              class="bg-white rounded-lg shadow-sm border border-gray-200 p-6"
+            >
+              <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                Application Settings
+              </h3>
+              <div class="space-y-4">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <label class="text-sm font-medium text-gray-700"
+                      >Email Notifications</label
+                    >
+                    <p class="text-sm text-gray-500">
+                      Receive notifications via email
+                    </p>
+                  </div>
+                  <button
+                    class="relative inline-flex h-6 w-11 items-center rounded-full bg-blue-600 transition-colors"
+                  >
+                    <span
+                      class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-6"
+                    ></span>
+                  </button>
+                </div>
+                <div class="flex items-center justify-between">
+                  <div>
+                    <label class="text-sm font-medium text-gray-700"
+                      >Auto-approve Users</label
+                    >
+                    <p class="text-sm text-gray-500">
+                      Automatically approve new user registrations
+                    </p>
+                  </div>
+                  <button
+                    class="relative inline-flex h-6 w-11 items-center rounded-full bg-gray-200 transition-colors"
+                  >
+                    <span
+                      class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-1"
+                    ></span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <script>
+      function showSection(sectionName) {
+        // Hide all sections
+        document.querySelectorAll(".section").forEach((section) => {
+          section.classList.add("hidden");
+        });
+
+        // Show selected section
+        document
+          .getElementById(sectionName + "Section")
+          .classList.remove("hidden");
+
+        // Update page title
+        const titles = {
+          users: "User Management",
+          dashboard: "Movies",
+          settings: "Settings",
+        };
+        document.getElementById("pageTitle").textContent = titles[sectionName];
+
+        // Update active sidebar link
+        document.querySelectorAll("nav a").forEach((link) => {
+          link.classList.remove("bg-blue-600", "text-white");
+          link.classList.add(
+            "text-gray-300",
+            "hover:bg-gray-700",
+            "hover:text-white"
+          );
+        });
+
+        event.target.classList.remove(
+          "text-gray-300",
+          "hover:bg-gray-700",
+          "hover:text-white"
+        );
+        event.target.classList.add("bg-blue-600", "text-white");
+
+        // If movies section, fetch movies using the new JS
+        if (sectionName === "dashboard") {
+          fetchAndRenderMovies();
+        }
+      }
+
+      // Initialize with users section
+      document.addEventListener("DOMContentLoaded", function () {
+        showSection("users");
+      });
+    </script>
+    <script src="{% static 'js/admin_dashboard.js' %}"></script>
+    <script src="{% static 'js/movies_dashboard.js' %}"></script>
+    <script src="{% static 'js/add_movie_modal.js' %}"></script>
+  </body>
+</html>

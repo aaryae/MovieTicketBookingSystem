@@ -1,0 +1,40 @@
+<!-- templates/landing/index.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Movie Portal - Landing</title>
+  </head>
+  <body
+    class="flex items-center justify-center min-h-screen bg-gradient-to-br from-purple-700 to-indigo-800 text-white text-center"
+  >
+    <div>
+      <h1 class="text-4xl font-bold mb-4">Welcome to Movie Portal</h1>
+      <p class="mb-6">Explore movies, book tickets, and enjoy!</p>
+      <a
+        href="/login/"
+        class="bg-white text-purple-700 font-bold px-6 py-3 rounded hover:bg-gray-200 transition"
+        >Login</a
+      >
+    </div>
+
+    <script>
+      // 🔐 Check auth
+      const role = localStorage.getItem("role");
+
+      if (!role) {
+        // Not logged in → go to login
+        window.location.href = "/login/";
+      } else if (role === "admin") {
+        window.location.href = "/sudo/dashboard/";
+      } else if (role === "user") {
+        window.location.href = "/user/profile/";
+      } else {
+        localStorage.clear();
+        window.location.href = "/login/";
+      }
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </body>
+</html>

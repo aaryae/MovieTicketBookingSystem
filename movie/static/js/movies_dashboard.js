@@ -73,3 +73,4 @@ window.handleMovieBoxClick = function(movieId) {
       }
     });
 }
+ 

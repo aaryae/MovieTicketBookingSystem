@@ -51,16 +51,23 @@ class ShowTimeAPI(ReadOnlyModelViewSet):
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_fields = ('movie',)
 
-class SeatAPI(ReadOnlyModelViewSet):
+class SeatAPI(ModelViewSet):
     queryset = Seat.objects.all()
     serializer_class = SeatSerializer
     filter_backends = (filters.DjangoFilterBackend,)
-    filterset_fields = ('showtime', 'is_booked')
+    filterset_fields = ('showtime', 'is_booked', 'is_unavailable')
+
+    def get_permissions(self):
+        if self.action in ['update', 'partial_update']:
+            return [permissions.IsAdminUser()]
+        return [permissions.IsAuthenticated()]
 
 class BookingAPI(ModelViewSet):
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
     permission_classes = [permissions.IsAuthenticated]
+    filter_backends = (filters.DjangoFilterBackend,)
+    filterset_fields = ('seat',)
 
     @transaction.atomic
     def create(self, request, *args, **kwargs):

@@ -34,4 +34,4 @@ document.addEventListener("DOMContentLoaded", function () {
       alert('Login error: ' + err);
     }
   });
-}); 
+});

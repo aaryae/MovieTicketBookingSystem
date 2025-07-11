@@ -31,4 +31,4 @@ document.addEventListener("DOMContentLoaded", function () {
       alert("An error occurred. Please try again.");
     }
   });
-}); 
+});

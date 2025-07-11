@@ -25,6 +25,7 @@ class Seat(models.Model):
     showtime = models.ForeignKey(ShowTime, on_delete=models.CASCADE, related_name="seats")
     seat_number = models.CharField(max_length=500)
     is_booked = models.BooleanField(default=False)
+    is_unavailable = models.BooleanField(default=False)  # Admin can mark seat as unavailable
 
     def __str__(self):
         return f"{self.showtime} - Seat {self.seat_number}"

@@ -181,6 +181,7 @@
       const urlParts = window.location.pathname.split("/");
       const movieId = urlParts[urlParts.length - 2];
       const adminToken = localStorage.getItem("admin_token");
+      const userRole = localStorage.getItem("user_role");
       const seatsContainer = document.getElementById("seats-container");
       const bookingMessage = document.getElementById("booking-message");
       // Get showtime from query param
@@ -225,19 +226,21 @@
           const filteredSeats = seats.filter(
             (seat) => seat.showtime == showtimeId
           );
-          // Map seat number to seat object
+          // Map seat number to seat object (by seat_number and by id for reliability)
           const seatMap = {};
           filteredSeats.forEach((seat) => {
-            seatMap[seat.seat_number ? seat.seat_number : seat.id] = seat;
+            seatMap[seat.seat_number] = seat;
+            seatMap[seat.id] = seat;
           });
           // Always render 30 seats, numbered 1 to 30
           for (let i = 1; i <= 30; i++) {
-            const seat = seatMap[i];
+            // Try to get seat by seat_number, fallback to id
+            const seat = seatMap[i] || Object.values(seatMap).find(s => s.seat_number == i);
             const seatDiv = document.createElement("div");
             seatDiv.className = "flex flex-col items-center";
             let svg = "";
-            if (!seat) {
-              // Seat does not exist in backend, show as unavailable (dark)
+            if (!seat || seat.is_unavailable) {
+              // Seat does not exist in backend or is marked unavailable, show as unavailable (dark)
               svg = `
               <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <ellipse cx="22" cy="16" rx="16" ry="10" fill="#374151" />
@@ -246,6 +249,60 @@
                 <ellipse cx="22" cy="38" rx="10" ry="2" fill="#6b7280" opacity="0.5" />
               </svg>
             `;
+              // Only admins can make black seats available
+              if (adminToken && userRole === 'admin') {
+                seatDiv.style.cursor = "pointer";
+                seatDiv.title = "Click to make available";
+                seatDiv.onclick = async function () {
+                  if (!confirm("Make this seat available?")) return;
+                  try {
+                    if (seat && seat.id) {
+                      // Seat exists but is unavailable, PATCH it
+                      const res = await fetch(`http://localhost:8001/movie/seats/${seat.id}/`, {
+                        method: "PATCH",
+                        headers: {
+                          Authorization: `Token ${adminToken}`,
+                          "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ is_unavailable: false }),
+                      });
+                      if (res.ok) {
+                        bookingMessage.textContent = `Seat ${i} is now available!`;
+                        seatDiv.innerHTML = "";
+                        location.reload();
+                      } else {
+                        const data = await res.json();
+                        bookingMessage.textContent = data.error || "Failed to update seat.";
+                      }
+                    } else {
+                      // Seat does not exist, create it
+                      const res = await fetch(`http://localhost:8001/movie/seats/`, {
+                        method: "POST",
+                        headers: {
+                          Authorization: `Token ${adminToken}`,
+                          "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                          showtime: showtimeId,
+                          seat_number: i,
+                          is_unavailable: false,
+                          is_booked: false
+                        }),
+                      });
+                      if (res.ok) {
+                        bookingMessage.textContent = `Seat ${i} created and is now available!`;
+                        seatDiv.innerHTML = "";
+                        location.reload();
+                      } else {
+                        const data = await res.json();
+                        bookingMessage.textContent = data.error || "Failed to create seat.";
+                      }
+                    }
+                  } catch (err) {
+                    bookingMessage.textContent = "Error making seat available.";
+                  }
+                };
+              }
             } else if (seat.is_booked) {
               // Booked seat
               svg = `
@@ -256,6 +313,39 @@
                 <ellipse cx="22" cy="38" rx="10" ry="2" fill="#d1d5db" opacity="0.5" />
               </svg>
             `;
+              // Add cancel booking button
+              const cancelBtn = document.createElement('button');
+              cancelBtn.textContent = 'Cancel';
+              cancelBtn.className = 'mt-1 px-2 py-1 text-xs rounded bg-red-500 text-white hover:bg-red-700';
+              cancelBtn.onclick = async function () {
+                if (!confirm('Cancel this booking?')) return;
+                try {
+                  // Get booking for this seat
+                  const token = localStorage.getItem('admin_token') || localStorage.getItem('user_token');
+                  const res = await fetch(`http://localhost:8001/movie/booking/?seat=${seat.id}`,
+                    { headers: { Authorization: token ? `Token ${token}` : undefined } });
+                  const bookings = await res.json();
+                  if (!Array.isArray(bookings) || bookings.length === 0) {
+                    bookingMessage.textContent = 'No booking found for this seat.';
+                    return;
+                  }
+                  const bookingId = bookings[0].id;
+                  const delRes = await fetch(`http://localhost:8001/movie/booking/${bookingId}/`, {
+                    method: 'DELETE',
+                    headers: { Authorization: token ? `Token ${token}` : undefined }
+                  });
+                  if (delRes.ok) {
+                    bookingMessage.textContent = `Booking for Seat ${i} cancelled.`;
+                    seatDiv.innerHTML = '';
+                    location.reload();
+                  } else {
+                    bookingMessage.textContent = 'Failed to cancel booking.';
+                  }
+                } catch (err) {
+                  bookingMessage.textContent = 'Error cancelling booking.';
+                }
+              };
+              seatDiv.appendChild(cancelBtn);
             } else {
               // Available seat
               svg = `
@@ -266,10 +356,31 @@
                 <ellipse cx="22" cy="38" rx="10" ry="2" fill="#d1d5db" opacity="0.5" />
               </svg>
             `;
-            }
-            seatDiv.innerHTML = svg + `<span class="text-xs mt-1">${i}</span>`;
-            if (seat && !seat.is_booked) {
-              seatDiv.onclick = async function () {
+              seatDiv.onclick = async function (e) {
+                if (adminToken && e.shiftKey) {
+                  if (!confirm("Mark this seat as unavailable?")) return;
+                  try {
+                    const res = await fetch(`http://localhost:8001/movie/seats/${seat.id}/`, {
+                      method: "PATCH",
+                      headers: {
+                        Authorization: `Token ${adminToken}`,
+                        "Content-Type": "application/json",
+                      },
+                      body: JSON.stringify({ is_unavailable: true }),
+                    });
+                    if (res.ok) {
+                      bookingMessage.textContent = `Seat ${i} marked as unavailable!`;
+                      seatDiv.innerHTML = "";
+                      location.reload();
+                    } else {
+                      const data = await res.json();
+                      bookingMessage.textContent = data.error || "Failed to update seat.";
+                    }
+                  } catch (err) {
+                    bookingMessage.textContent = "Error updating seat.";
+                  }
+                  return;
+                }
                 if (!confirm("Are you sure you want to book this seat?"))
                   return;
                 try {
@@ -312,6 +423,7 @@
                 }
               };
             }
+            seatDiv.innerHTML = svg + `<span class="text-xs mt-1">${i}</span>`;
             seatsContainer.appendChild(seatDiv);
           }
         });

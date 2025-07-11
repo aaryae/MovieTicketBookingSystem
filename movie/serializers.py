@@ -43,7 +43,7 @@ class ShowTimeSerializer(ModelSerializer):
 class SeatSerializer(ModelSerializer):
     class Meta:
         model = Seat
-        fields = "__all__"
+        fields = "__all__"  # includes is_unavailable
 
 
 class BookingSerializer(ModelSerializer):

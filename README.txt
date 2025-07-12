@@ -30,6 +30,10 @@ source menv/bin/activate  # Windows: menv\Scripts\activate
 # Install dependencies
 pip install -r requirements.txt
 
+# Run database migrations
+python manage.py makemigrations
+python manage.py migrate
+
 # Setup environment
 python manage.py createsuperuser
 ```

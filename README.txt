@@ -10,13 +10,12 @@ Complete movie booking system with Django backend + HTML, CSS and vanilla JavaSc
 
 ## 📚 Libraries Used
 
-```bash
-# Core Framework
-django==5.2.4              # High-performance web framework
+- **Backend:**
+  - [Django 5.2.4](https://www.djangoproject.com/) – High-performance Python web framework
 
-# Database 
-sqlite (built-in with Python)             # SQL database (built-in)
-```
+- **Frontend:**
+  - [Tailwind CSS](https://tailwindcss.com/) – Utility-first CSS framework (via CDN)
+  - **Vanilla JavaScript** – No frontend framework, just modern JS
 
 ## 🚀 Quick Setup
 

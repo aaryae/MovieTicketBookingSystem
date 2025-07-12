@@ -128,6 +128,182 @@ document.addEventListener("DOMContentLoaded", function () {
       });
   }
 
+  // SHOWTIME MANAGEMENT FUNCTIONS
+  function loadShowtimesData() {
+    console.log("loadShowtimesData called");
+    loadMoviesForSelect();
+    loadShowtimesList();
+  }
+
+  function loadMoviesForSelect() {
+    const select = document.getElementById("showtime-movie-select");
+    if (!select) {
+      console.log("Movie select element not found");
+      return;
+    }
+    
+    const token = localStorage.getItem("admin_token");
+    console.log("Loading movies with token:", token ? "Token present" : "No token");
+    
+    fetch("http://localhost:8001/movie/movies/", {
+      headers: { Authorization: token ? `Token ${token}` : undefined },
+    })
+      .then((res) => {
+        console.log("Movies API response status:", res.status);
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+        }
+        return res.json();
+      })
+      .then((movies) => {
+        console.log("Movies fetched:", movies);
+        select.innerHTML = '<option value="">Select a movie...</option>' + 
+          movies.map((m) => `<option value="${m.id}">${m.title}</option>`).join("");
+        console.log("Dropdown populated with", movies.length, "movies");
+      })
+      .catch((err) => {
+        console.error("Error loading movies:", err);
+        select.innerHTML = '<option value="">Error loading movies</option>';
+      });
+  }
+
+  function loadShowtimesList() {
+    const container = document.getElementById("showtimes-list-container");
+    if (!container) return;
+    
+    const token = localStorage.getItem("admin_token");
+    Promise.all([
+      fetch("http://localhost:8001/movie/movies/", {
+        headers: { Authorization: token ? `Token ${token}` : undefined },
+      }).then((res) => res.json()),
+      fetch("http://localhost:8001/movie/showtimes/", {
+        headers: { Authorization: token ? `Token ${token}` : undefined },
+      }).then((res) => res.json()),
+    ]).then(([movies, showtimes]) => {
+      // Create movie lookup map
+      const movieMap = {};
+      movies.forEach((m) => (movieMap[m.id] = m));
+      
+      // Group showtimes by movie
+      const grouped = {};
+      showtimes.forEach((st) => {
+        if (!grouped[st.movie]) grouped[st.movie] = [];
+        grouped[st.movie].push(st);
+      });
+      
+      let html = '';
+      Object.keys(grouped).forEach((movieId) => {
+        const movie = movieMap[movieId];
+        html += `<div class="mb-6 p-4 border rounded-lg">
+          <h4 class="text-lg font-bold text-gray-800 mb-3">${movie ? movie.title : 'Movie #' + movieId}</h4>
+          <div class="space-y-2">`;
+        grouped[movieId].forEach((st) => {
+          const date = new Date(st.start_time).toLocaleString();
+          html += `<div class="flex items-center justify-between p-2 bg-gray-50 rounded">
+            <span class="text-blue-700 font-mono">${date}</span>
+            <div class="flex gap-2">
+              <a href="/booking/${movieId}/?showtime=${st.id}" class="text-xs text-blue-500 underline">Manage Seats</a>
+              <button onclick="deleteShowtime(${st.id})" class="text-xs text-red-500 underline">Delete</button>
+            </div>
+          </div>`;
+        });
+        html += '</div></div>';
+      });
+      
+      if (!html) html = '<p class="text-gray-500">No showtimes found.</p>';
+      container.innerHTML = html;
+    }).catch((err) => {
+      console.error("Error loading showtimes:", err);
+      container.innerHTML = '<p class="text-red-500">Failed to load showtimes.</p>';
+    });
+  }
+
+  function deleteShowtime(showtimeId) {
+    if (!confirm("Are you sure you want to delete this showtime?")) return;
+    
+    const token = localStorage.getItem("admin_token");
+    fetch(`http://localhost:8001/movie/showtimes/${showtimeId}/`, {
+      method: "DELETE",
+      headers: { Authorization: token ? `Token ${token}` : undefined },
+    })
+      .then((res) => {
+        if (res.ok) {
+          loadShowtimesList();
+        } else {
+          alert("Failed to delete showtime");
+        }
+      })
+      .catch((err) => {
+        console.error("Error deleting showtime:", err);
+        alert("Error deleting showtime");
+      });
+  }
+
+  // Handle showtime form submission
+  const showtimeForm = document.getElementById("addShowtimeForm");
+  if (showtimeForm) {
+    showtimeForm.addEventListener("submit", async function(e) {
+      e.preventDefault();
+      
+      const movie = document.getElementById("showtime-movie-select").value;
+      const start_time = document.getElementById("showtime-start-time").value;
+      const errorDiv = document.getElementById("addShowtimeError");
+      
+      if (!movie || !start_time) {
+        errorDiv.textContent = "Please select a movie and start time.";
+        return;
+      }
+      
+      errorDiv.textContent = "";
+      const token = localStorage.getItem("admin_token");
+      
+      try {
+        const res = await fetch("http://localhost:8001/movie/showtimes/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token ? `Token ${token}` : undefined,
+          },
+          body: JSON.stringify({ movie, start_time }),
+        });
+        
+        if (res.ok) {
+          showtimeForm.reset();
+          loadShowtimesList();
+          errorDiv.textContent = "Showtime added successfully!";
+          setTimeout(() => errorDiv.textContent = "", 3000);
+        } else {
+          const data = await res.json();
+          errorDiv.textContent = data.error || "Failed to add showtime.";
+        }
+      } catch (err) {
+        console.error("Error adding showtime:", err);
+        errorDiv.textContent = "Error adding showtime.";
+      }
+    });
+  }
+
+  // Make functions globally available
+  window.loadShowtimesData = loadShowtimesData;
+  window.deleteShowtime = deleteShowtime;
+  
+  // Debug function to manually set admin token (for testing)
+  window.setAdminToken = function(token) {
+    localStorage.setItem('admin_token', token);
+    console.log('Admin token set:', token);
+    alert('Admin token set! Refresh the page or navigate to Showtimes section.');
+  };
+  
+  // Debug function to check current token
+  window.checkToken = function() {
+    const token = localStorage.getItem('admin_token');
+    console.log('Current admin token:', token ? 'Present' : 'Missing');
+    if (token) {
+      console.log('Token value:', token);
+    }
+    return token;
+  };
+
   // Initial fetch
   fetchUsers();
 }); 

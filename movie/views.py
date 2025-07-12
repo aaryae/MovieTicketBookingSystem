@@ -45,9 +45,10 @@ class MovieAPI(ModelViewSet):
         context['request'] = self.request
         return context
 
-class ShowTimeAPI(ReadOnlyModelViewSet):
+class ShowTimeAPI(ModelViewSet):
     queryset = ShowTime.objects.all()
     serializer_class = ShowTimeSerializer
+    permission_classes = [permissions.IsAuthenticated]
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_fields = ('movie',)
 

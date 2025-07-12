@@ -11,8 +11,8 @@
         theme: {
           extend: {
             colors: {
-              'royal-blue': '#4169E1',
-              'royal-blue-dark': '#3457D1',
+              "royal-blue": "#4169E1",
+              "royal-blue-dark": "#3457D1",
             },
             animation: {
               "fade-in": "fadeIn 2s ease-in-out",
@@ -47,21 +47,20 @@
     <!-- Background with overlay -->
     <div
       class="fixed inset-0"
-      style="background-image: linear-gradient(to top, #e6e9f0 0%, #eef1f5 100%)"
-    >
-    </div>
+      style="
+        background-image: linear-gradient(to top, #e6e9f0 0%, #eef1f5 100%);
+      "
+    ></div>
 
     <!-- Main content -->
     <div class="relative z-10 min-h-screen flex flex-col">
       <!-- Navigation -->
       <nav
-        class="p-6 flex justify-center items-center backdrop-blur-md bg-black/20 border-b border-white/10"
+        class="p-3 flex justify-center items-center backdrop-blur-md bg-transparent border-b border-black"
       >
-        <div class="flex items-center space-x-3 animate-fade-in">
+        <div class="flex flex-col items-center space-x-3 animate-fade-in">
           <!-- Logo -->
-          <div
-            class="bg-royal-blue p-3 rounded-full animate-float"
-          >
+          <div class="bg-royal-blue p-3 rounded-full animate-float">
             <svg
               class="w-8 h-8 text-white"
               fill="currentColor"
@@ -72,11 +71,7 @@
               />
             </svg>
           </div>
-          <h1
-            class="text-3xl font-bold text-black"
-          >
-            Aaryae
-          </h1>
+          <h1 class="text-3xl font-bold text-black">aaryae</h1>
         </div>
       </nav>
 
@@ -87,9 +82,7 @@
             class="text-6xl md:text-8xl font-bold text-black mb-6 leading-tight"
           >
             Welcome to
-            <span
-              class="block text-black animate-fade-in"
-            >
+            <span class="block text-black animate-fade-in">
               Movie Paradise
             </span>
           </h2>
@@ -203,8 +196,13 @@
 
       <!-- Movie Section -->
       <section class="max-w-6xl mx-auto p-2">
-        <h2 class="text-3xl font-bold text-black mb-8 text-center">Now Showing</h2>
-        <div id="movies-container" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+        <h2 class="text-3xl font-bold text-black mb-8 text-center">
+          Now Showing
+        </h2>
+        <div
+          id="movies-container"
+          class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8"
+        ></div>
       </section>
 
       <!-- Footer -->
@@ -236,6 +234,21 @@
         style="animation-delay: 3s"
       ></div>
     </div>
+    <button
+  onclick="handleLogout()"
+  class="fixed left-3 top-1/2 transform -translate-y-1/2 bg-red-500 text-white px-4 py-2 rounded-full shadow-lg hover:bg-red-600 transition-all duration-300 z-50"
+  title="Logout"
+>
+  Logout
+</button>
+
+<script>
+  function handleLogout() {
+    localStorage.removeItem("user_token");
+    localStorage.removeItem("admin_token");
+    window.location.href = "/login";
+  }
+</script>
     <script src="/static/js/movies_dashboard.js"></script>
     <script>
       document.addEventListener("DOMContentLoaded", function () {

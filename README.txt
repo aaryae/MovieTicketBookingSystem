@@ -6,17 +6,17 @@ Complete movie booking system with Django backend + HTML, CSS and vanilla JavaSc
 
 - **🎫 Customer**: Browse movies, book seats, manage bookings
 - **👨‍💼 Admin**: Manage movies, Manage users, system control
-- **🔐 Security**: Simple auth, role-based access
+- **🔐 Security**: Simple  ken based auth, role-based access
 
 ##  Libraries Used
 
 ```bash
 # Core Framework
-Django>=0.104.1              # High-performance web framework
+django==5.2.4              # High-performance web framework
 
 
 # Database 
-sqlite>=2.0.23             # SQL toolkit and ORM
+sqlite (built-in with Python)             # SQL database (built-in)
 
 
 ## 🚀 Quick Setup
@@ -50,4 +50,64 @@ can also check custom django admin panel with localhost:8001/admin
 
 - **Role Protection**: Admin-only movie management and protected routes to admin
 
+## 🎟️ Booking Flow
+
+1. **Login/Register**
+   - User logs in or creates a new account via the login/signup page.
+
+2. **Browse Movies**
+   - After login, the user lands on the movie listing page.
+   - User can search and browse available movies.
+
+3. **Select Movie & Showtime**
+   - Click on a movie card to view available showtimes.
+   - Select a showtime to proceed to seat selection.
+
+4. **Choose Seat**
+   - The seat map displays available (green), booked (red), and unavailable (black) seats.
+   - Click on a green seat to select it for booking.
+
+5. **Confirm Booking**
+   - A confirmation dialog appears before booking.
+   - Upon confirmation, the seat is booked and turns red.
+
+6. **View/Cancel Bookings**
+   - Booked seats can be cancelled (if allowed) by clicking the 'Cancel' button on the seat.
+
+7. **Logout**
+   - User can log out to end the session.
+
 ---
+
+## 🛠️ Admin Flow
+
+1. **Admin Login**
+   - Admin logs in using admin credentials.
+   - Redirected to the admin dashboard.
+
+2. **Dashboard Overview**
+   - View system stats, user list, and movie management options.
+
+3. **Manage Movies**
+   - Add, edit, or delete movies.
+   - Upload movie posters and details.
+
+4. **Manage Showtimes**
+   - Add or edit showtimes for movies.
+   - Assign showtimes to specific movies.
+
+5. **Manage Seats**
+   - View and manage seat availability for each showtime.
+   - Mark seats as unavailable (black), available (green), or booked (red).
+   - Create new seats for a showtime if needed.
+
+6. **User Management**
+   - View all registered users.
+   - Delete users if necessary.
+
+7. **Booking Management**
+   - View all bookings.
+   - Cancel bookings if required.
+
+8. **Logout**
+   - Admin can log out to end the session.
